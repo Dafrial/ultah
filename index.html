@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Sayang! 🎂</title>
+    <style>
+        /* PERBAIKAN: Pengaturan dasar untuk mengatasi space kosong dan scrolling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            overflow-x: hidden; /* Paling penting untuk mencegah scroll horizontal */
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+
+        /* PERBAIKAN: Container utama yang mengatur posisi */
+        .container {
+            position: relative;
+            width: 100%; /* Memastikan container tidak lebih lebar dari layar */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column; /* Mengatur page dan progress bar secara vertikal */
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .page {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            max-width: 550px;
+            width: 100%; /* Lebar akan menyesuaikan padding di container */
+            position: relative;
+            overflow: hidden; /* Mencegah shimmer keluar dari box */
+            animation: fadeInUp 1s ease-out;
+            z-index: 10;
+        }
+        
+        /* Animasi masuk dari bawah */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Animasi kilau (shimmer) */
+        .page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shimmer 3s infinite 1s;
+        }
+
+        @keyframes shimmer {
+            0% { left: -150%; }
+            100% { left: 150%; }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .cake-emoji {
+            font-size: 4rem;
+            animation: bounce 2s infinite;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-10px); }
+        }
+
+        .lotso {
+            width: 120px;
+            margin: 20px auto;
+            animation: wiggle 2.5s ease-in-out infinite;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .lotso:hover {
+            transform: scale(1.1);
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-4deg); }
+            50% { transform: rotate(4deg); }
+        }
+
+        h1 {
+            color: #4a154b;
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            color: #4a154b;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        .message-text {
+            background: #fdf6f9;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px dashed #ffc0cb;
+            margin: 20px 0;
+            color: #4a154b;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            text-align: left;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        /* BARU: Halaman Generator Kupon */
+        #voucher-container {
+            background: #fff;
+            border: 3px dashed #764ba2;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px auto;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: all 0.5s ease;
+        }
+        
+        #voucher-text {
+            font-size: 1.3rem;
+            color: #4a154b;
+            font-weight: bold;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* PERBAIKAN: Penomoran halaman dibuat lebih baik */
+        .page-counter {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* PERBAIKAN: Progress bar ditempatkan di bawah box utama */
+        .progress-bar {
+            width: 100%;
+            max-width: 550px; /* Lebarnya sama dengan .page */
+            height: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            margin-top: 20px;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #fbc2eb 0%, #a6c1ee 100%);
+            border-radius: 5px;
+            transition: width 0.5s ease-out;
+        }
+        
+        /* PERBAIKAN: Responsivitas yang lebih baik */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            .page {
+                padding: 25px;
+            }
+            h1 { font-size: 1.8rem; }
+            h2 { font-size: 1.5rem; }
+            .subtitle { font-size: 1rem; }
+            .cake-emoji { font-size: 3rem; }
+            .lotso { width: 100px; }
+            .btn { padding: 12px 25px; font-size: 1rem; }
+            #voucher-text { font-size: 1.1rem; }
+            .message-text { padding: 20px; font-size: 1rem; }
+        }        /* BARU: Gaya untuk slideshow */
+        .slideshow-container {
+            position: relative;
+            max-width: 100%;
+            margin: 20px auto;
+            overflow: hidden;
+            border-radius: 15px;
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        .slide {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeEffect 0.8s;
+            padding: 20px;
+        }
+
+        .slide-image {
+            max-width: 100%;
+            max-height: 400px;
+            width: auto;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            object-fit: contain;
+        }
+
+        .slide-description {
+            position: relative;
+            background: rgba(255,255,255,0.95);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            font-size: 1rem;
+            color: #4a154b;
+            text-align: center;
+            font-style: italic;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .slide-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.8);
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 50%;
+            font-size: 18px;
+            color: #4a154b;
+            transition: all 0.3s ease;
+        }
+
+        .slide-btn:hover {
+            background: rgba(255,255,255,0.95);
+        }
+
+        .prev { left: 10px; }
+        .next { right: 10px; }
+
+        .slide-dots {
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .dot {
+            height: 10px;
+            width: 10px;
+            margin: 0 5px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background-color: #ff8e8e;
+            transform: scale(1.2);
+        }
+
+        @keyframes fadeEffect {
+            from { opacity: 0.4; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page" id="page1">
+            <div class="page-counter">1 / 4</div>
+            <div class="cake-emoji">🎂</div>
+            <h1>Hai Bocilllll</h1>
+            <p class="subtitle">Makasih udah klik linknyaaa😁</p>
+            <p class="subtitle">jangan lupa di klik ya tombolnyaa....</p>
+            <div class="lotso">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M86.51,57.88c-4.43-1.42-8.32-4.14-11.43-7.58-1.55-1.71-2.9-3.6-4.06-5.61-2.61-4.52-3.8-9.87-3.53-15.22.25-4.88,1.93-9.5,4.71-13.34,2.95-4.08,7.03-7.1,11.8-8.49,4.2-.95,8.62-.95,12.82,0,4.77,1.38,8.85,4.4,11.8,8.49,2.78,3.84,4.46,8.46,4.71,13.34.27,5.35-1,10.7-3.53,15.22-1.16,2-2.51,3.9-4.06,5.61-3.11,3.44-7,6.16-11.43,7.58-4.2.95-8.62.95-12.82,0Z" transform="translate(-40 -1)" fill="#e57373"/><path d="M78.68,81.33c-1.39-3.44-3.53-6.53-6.28-8.91-2.9-2.51-6.3-4.2-9.94-4.85-7.58-1.35-15.19,1.15-20.21,6.38-4.92,5.13-7.01,12.35-5.63,19.34,1.4,7.09,6.29,13.12,12.92,16.27,7.1,3.37,15.54,3.37,22.64,0,6.63-3.15,11.52-9.18,12.92-16.27,1.38-6.99-.71-14.21-5.63-19.34a21.32,21.32,0,0,0-1.79-1.68Z" transform="translate(-40 -1)" fill="#f06292"/><path d="M78.68,81.33c-1.39-3.44-3.53-6.53-6.28-8.91-2.9-2.51-6.3-4.2-9.94-4.85-7.58-1.35-15.19,1.15-20.21,6.38-4.92,5.13-7.01,12.35-5.63,19.34,1.4,7.09,6.29,13.12,12.92,16.27,7.1,3.37,15.54,3.37,22.64,0,6.63-3.15,11.52-9.18,12.92-16.27,1.38-6.99-.71-14.21-5.63-19.34a21.32,21.32,0,0,0-1.79-1.68Z" transform="translate(-40 -1)" fill="#f06292"/><path d="M96.4,24.41c2.95-4.08,7.03-7.1,11.8-8.49,4.2-.95,8.62-.95,12.82,0,4.77,1.38,8.85,4.4,11.8,8.49a19.78,19.78,0,0,1,4.71,13.34c.11,2.2-.28,4.39-1.09,6.44-2.12-3.8-5.06-6.91-8.58-8.89-4.29-2.39-9.16-3.3-14.07-2.53-5.12.8-9.82,3.46-13.3,7.44-2.6,2.97-4.3,6.68-4.94,10.66-.08.52-.13,1-.13,1.54,0,.26,0,.52,0,.78.27-5.35-1-10.7-3.53-15.22,1.16-2,2.51-3.9,4.06-5.61Z" transform="translate(-40 -1)" fill="#c2185b"/><path d="M68.5,108.52c7.1,3.37,15.54,3.37,22.64,0,6.63-3.15,11.52-9.18,12.92-16.27,1.38-6.99-.71-14.21-5.63-19.34a21.32,21.32,0,0,0-1.79-1.68c-1.31,4.33-3.79,8.28-7.18,11.33-4.11,3.57-9.3,5.65-14.77,5.75-5.67.1-11.13-1.92-15.4-5.6-3.32-2.88-5.68-6.9-6.7-11.37-1.35,7.21.8,14.71,5.91,19.84Z" transform="translate(-40 -1)" fill="#ec407a"/><circle cx="58" cy="40.81" r="5.73" fill="#fff"/><circle cx="82.45" cy="40.81" r="5.73" fill="#fff"/><circle cx="58" cy="41.81" r="2.73" fill="#212121"/><circle cx="82.45" cy="41.81" r="2.73" fill="#212121"/><path d="M67.73,50.81a2.86,2.86,0,0,1,5.2,0Z" transform="translate(-40 -1)" fill="#7b1fa2"/><ellipse cx="70.5" cy="85" rx="15" ry="12" fill="#f8bbd0"/></svg>
+            </div>
+            <button class="btn" onclick="nextPage(2)">Geser disini...</button>
+        </div>
+
+        <div class="page hidden" id="page2">
+            <div class="page-counter">2 / 4</div>
+            <h2>Sedikit Pesan dari ku</h2>
+            <div class="message-text">
+                Selamat ulang tahun bocilll 🎉<br><br>
+                yey bocilll udah gak kecik🤏 lagi yaaa hehehe, udah dewasa yaa<br>
+                umm maaf yaa kalau ini ngebuat kamu kaget, tapi aku cuma mau nyampain beberapa kata aja boleh kan? <br>
+                umm oiyaa selamat ulang tahun sekali lagi yaa. aku harap kamu dapat
+                kebahagiaan yang kamu inginkan, semoga kamu selalu sehat, bahagia, dan sukses dalam segala hal yang kamu lakukan. 
+                jangan lupaa untuk selalu bersyukur atas segala hal yang kamu miliki, kamu wanita kuat yang pernah aku temui dihidupku.
+                aku sangat bersyukur bisa mengenalmu, kamu adalah wanita pertama yang punya perasaan tulus ke aku.
+                umm apalagi yaa, aku harap kamu dapet jodoh yang baik, yang bisa sayang sama kamu, yang bisa bahagiain kamu, yang bisa nemenin kamu sampai tua nanti.
+                aku harap kamu bisa bahagia sama orang yang kamu cintai, dan aku harap kamu bisa bahagia sama orang yang mencintaimu.
+                umm apa lagi yaa, oiyaa kalau misalnya barang-barang dari aku masih membuat kamu keinget ama aku. kamu boleh kok di donasikan ke orang yang mau menerima,
+                aku gapapa-apa, aku cuma mau kamu bahagia, happy selalu bocil😁. umm apa lagi yaa, oiyaa stay strong yaa aku tau pasti berat masalah yang kamu hadapi.
+                tapi kamu harus tetap semangat, kamu harus tetap berjuang, kamu harus tetap berusaha, kalo misalnya udah gak kuat atau merasa nyerah. ngadu ke Allah aja yaaa.
+                kamu harus percaya, Allah gak akan kasih cobaan yang gak bisa kamu hadapi, Allah sayang sama kamu, Allah pasti akan kasih jalan keluar buat kamu.
+                oiyaa jangan banyak-banyak makan ecimm nyaa nanti batuk.
+                umm okee dehh itu aja yang mau aku sampaikan maaf malah jadi banyak gini hehehehe, semoga kamu suka sama website yang aku buat ini, semoga kamu suka sama surprise ini.
+                maaf kalau aku gak bisa kasih surprise yang lebih bagus, maaf kalau jelek websitenya 😖.
+                okee deh itu aja yang mau aku sampein, sekali lagi selamat ulang tahun bocilll, semoga kamu bahagia selalu. semoga kamu sehat selalu, semoga kamu sukses selalu.
+            </div>
+            <button class="btn" onclick="nextPage(4)">Ada lagi nih...</button>
+        </div>
+        
+      
+
+        <div class="page hidden" id="page4">
+            <div class="page-counter">3 / 4</div>
+            <h2>Memories</h2>
+            <p class="subtitle">aku boleh kan nyimpen ini semua?</p>
+            
+            <div class="slideshow-container">
+                <div class="slide">
+                    <img src="gambar1.jpg" class="slide-image">
+                    <p class="slide-description">
+                        ini aku masih inget banget, waktu itu kamu ngetik ini buat aku termotivassi, aku masih inget banget kamu bilang "kamu bisa kok, kamu pasti bisa, kamu pasti bisa jadi yang terbaik"
+                    </p>
+                </div>
+                <div class="slide hidden">
+                    <img src="gambar2.jpg" class="slide-image">
+                    <img src="gambar3.jpg" class="slide-image">
+                    <p class="slide-description">
+                        boleh kan nama nama ini nanti aku pakai buat anak-anak aku?
+                         hehehe, aku masih inget banget waktu itu kamu bilang
+                          "kamu mau gak kalau anak kita namanya ini dan itu?" 
+                          aku jawab iya dong, aku suka banget sama nama itu.
+                    </p>
+                </div>
+                <div class="slide hidden">
+                    <img src="gambar4.jpg" class="slide-image">
+                    <p class="slide-description">
+                        oiya semua poto yang kamu kirim ke aku itu aku simpen loh,
+                        aku masukin ke drive aku, aku suka banget sama poto-poto itu,
+                        lucu-lucu semuaa, aku suka banget.
+                    </p>
+                </div>
+                
+               
+            </div>
+            
+            <button class="btn" onclick="nextPage(5)">Satu halaman terakhir...</button>
+        </div>
+
+        <div class="page hidden" id="page5">
+            <div class="page-counter">4 / 4</div>
+            <div class="cake-emoji">😭</div>
+            <h2>mohon maaf banget kalau ini bikin kamu kaget</h2>
+            <p class="subtitle">aku cuma mau nepatin janji ku dulu aja udah sih itu aja, gak mau bermaksud yang lain.</p>
+            <div class="lotso" style="width: 150px;">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M86.51,57.88c-4.43-1.42-8.32-4.14-11.43-7.58-1.55-1.71-2.9-3.6-4.06-5.61-2.61-4.52-3.8-9.87-3.53-15.22.25-4.88,1.93-9.5,4.71-13.34,2.95-4.08,7.03-7.1,11.8-8.49,4.2-.95,8.62-.95,12.82,0,4.77,1.38,8.85,4.4,11.8,8.49,2.78,3.84,4.46,8.46,4.71,13.34.27,5.35-1,10.7-3.53,15.22-1.16,2-2.51,3.9-4.06,5.61-3.11,3.44-7,6.16-11.43,7.58-4.2.95-8.62.95-12.82,0Z" transform="translate(-40 -1)" fill="#e57373"/><path d="M78.68,81.33c-1.39-3.44-3.53-6.53-6.28-8.91-2.9-2.51-6.3-4.2-9.94-4.85-7.58-1.35-15.19,1.15-20.21,6.38-4.92,5.13-7.01,12.35-5.63,19.34,1.4,7.09,6.29,13.12,12.92,16.27,7.1,3.37,15.54,3.37,22.64,0,6.63-3.15,11.52-9.18,12.92-16.27,1.38-6.99-.71-14.21-5.63-19.34a21.32,21.32,0,0,0-1.79-1.68Z" transform="translate(-40 -1)" fill="#f06292"/><path d="M78.68,81.33c-1.39-3.44-3.53-6.53-6.28-8.91-2.9-2.51-6.3-4.2-9.94-4.85-7.58-1.35-15.19,1.15-20.21,6.38-4.92,5.13-7.01,12.35-5.63,19.34,1.4,7.09,6.29,13.12,12.92,16.27,7.1,3.37,15.54,3.37,22.64,0,6.63-3.15,11.52-9.18,12.92-16.27,1.38-6.99-.71-14.21-5.63-19.34a21.32,21.32,0,0,0-1.79-1.68Z" transform="translate(-40 -1)" fill="#f06292"/><path d="M96.4,24.41c2.95-4.08,7.03-7.1,11.8-8.49,4.2-.95,8.62-.95,12.82,0,4.77,1.38,8.85,4.4,11.8,8.49a19.78,19.78,0,0,1,4.71,13.34c.11,2.2-.28,4.39-1.09,6.44-2.12-3.8-5.06-6.91-8.58-8.89-4.29-2.39-9.16-3.3-14.07-2.53-5.12.8-9.82,3.46-13.3,7.44-2.6,2.97-4.3,6.68-4.94,10.66-.08.52-.13,1-.13,1.54,0,.26,0,.52,0,.78.27-5.35-1-10.7-3.53-15.22,1.16-2,2.51-3.9,4.06-5.61Z" transform="translate(-40 -1)" fill="#c2185b"/><path d="M68.5,108.52c7.1,3.37,15.54,3.37,22.64,0,6.63-3.15,11.52-9.18,12.92-16.27,1.38-6.99-.71-14.21-5.63-19.34a21.32,21.32,0,0,0-1.79-1.68c-1.31,4.33-3.79,8.28-7.18,11.33-4.11,3.57-9.3,5.65-14.77,5.75-5.67.1-11.13-1.92-15.4-5.6-3.32-2.88-5.68-6.9-6.7-11.37-1.35,7.21.8,14.71,5.91,19.84Z" transform="translate(-40 -1)" fill="#ec407a"/><circle cx="58" cy="40.81" r="5.73" fill="#fff"/><circle cx="82.45" cy="40.81" r="5.73" fill="#fff"/><circle cx="58" cy="41.81" r="2.73" fill="#212121"/><circle cx="82.45" cy="41.81" r="2.73" fill="#212121"/><path d="M67.73,50.81a2.86,2.86,0,0,1,5.2,0Z" transform="translate(-40 -1)" fill="#7b1fa2"/><ellipse cx="70.5" cy="85" rx="15" ry="12" fill="#f8bbd0"/></svg>
+            </div>
+            <button class="btn" onclick="restart()">Ulangi Kejutannya</button>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- BARU: Slideshow untuk halaman 4 -->
+        <div class="slideshow-container hidden" id="slideshow">
+            <div class="slide">
+                <img src="https://via.placeholder.com/600x400/FFC0CB/000000?text=Foto+1" style="width:100%; border-radius:15px; object-fit: cover;">
+            </div>
+            <div class="slide">
+                <img src="https://via.placeholder.com/600x400/A6C1EE/000000?text=Foto+2" style="width:100%; border-radius:15px; object-fit: cover;">
+            </div>
+            <div class="slide">
+                <img src="https://via.placeholder.com/600x400/FBC2EB/000000?text=Foto+3" style="width:100%; border-radius:15px; object-fit: cover;">
+            </div>
+        </div>
+        <div class="dot-container" id="dotContainer">
+            <span class="dot" onclick="goToSlide(0)"></span>
+            <span class="dot" onclick="goToSlide(1)"></span>
+            <span class="dot" onclick="goToSlide(2)"></span>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const totalPages = 5;
+
+        // BARU: Daftar kupon yang bisa kamu edit
+        const vouchers = [
+            "Kupon 1x Pelukan Hangat",
+            "Kupon 1x Jalan-Jalan Santai",
+            "Kupon 1x Es Krim Gratis dariku",
+            "Kupon 1x Nonton Film Pilihanmu",
+            "Kupon 1x Pijat Punggung Gratis",
+            "Kupon 1x Dibikinin Teh/Kopi",
+            "Kupon 1x Dengerin Semua Ceritamu",
+            "Kupon 'Kamu Menang' Argumen Hari Ini"
+        ];
+        let lastVoucherIndex = -1;
+
+        function nextPage(pageNum) {
+            document.getElementById(`page${currentPage}`).classList.add('hidden');
+            document.getElementById(`page${pageNum}`).classList.remove('hidden');
+            currentPage = pageNum;
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const progress = ((currentPage - 1) / (totalPages - 1)) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        // BARU: Fungsi untuk menghasilkan kupon acak
+        function generateVoucher() {
+            const voucherText = document.getElementById('voucher-text');
+            const btn = document.getElementById('generateVoucherBtn');
+            
+            btn.disabled = true;
+            voucherText.style.animation = 'none'; // Reset animation
+            void voucherText.offsetWidth; // Trigger reflow
+
+            let randomIndex;
+            // Pastikan kupon yang muncul berbeda dari sebelumnya
+            do {
+                randomIndex = Math.floor(Math.random() * vouchers.length);
+            } while (randomIndex === lastVoucherIndex);
+            
+            lastVoucherIndex = randomIndex;
+            
+            voucherText.textContent = vouchers[randomIndex];
+            voucherText.style.animation = 'fadeIn 0.5s';
+            
+            setTimeout(() => {
+                btn.disabled = false;
+            }, 500); // Mencegah spam klik
+        }
+
+        function restart() {
+            nextPage(1);
+        }
+
+        // Inisialisasi progress bar saat halaman pertama kali dimuat
+        document.addEventListener('DOMContentLoaded', () => {
+            updateProgress();
+        });
+
+        /* BARU: Script untuk slideshow */
+        let currentSlide = 0;
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        function goToSlide(n) {
+            showSlide(n);
+        }
+
+        function showSlide(n) {
+            const slides = document.getElementsByClassName('slide');
+            const dots = document.getElementsByClassName('dot');
+            
+            if (n >= slides.length) { currentSlide = 0; }
+            else if (n < 0) { currentSlide = slides.length - 1; }
+            else { currentSlide = n; }
+            
+            // Hide all slides
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].classList.add('hidden');
+                dots[i].classList.remove('active');
+            }
+            
+            // Show current slide
+            slides[currentSlide].classList.remove('hidden');
+            dots[currentSlide].classList.add('active');
+        }
+
+        // Mulai slideshow secara otomatis
+        let slideInterval = setInterval(() => {
+            changeSlide(1);
+        }, 5000);
+
+        // Hentikan slideshow saat halaman diubah
+        function nextPage(pageNum) {
+            document.getElementById(`page${currentPage}`).classList.add('hidden');
+            document.getElementById(`page${pageNum}`).classList.remove('hidden');
+            currentPage = pageNum;
+            updateProgress();
+
+            if (pageNum === 4) {
+                clearInterval(slideInterval);
+                showSlide(0); // Tampilkan slide pertama
+                document.getElementById('slideshow').classList.remove('hidden');
+            } else {
+                document.getElementById('slideshow').classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
